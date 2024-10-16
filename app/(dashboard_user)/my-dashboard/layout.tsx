@@ -1,6 +1,6 @@
 "use client";
 
-import LogoutButton from "@/app/components/LogoutButton";
+import LogoutButton from "@/components/client/LogoutButton";
 import {
     Breadcrumb,
     BreadcrumbItem,

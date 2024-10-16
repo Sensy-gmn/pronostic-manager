@@ -1,3 +1,6 @@
+import { Footer } from "@/components/client/Footer";
+import { Header } from "@/components/client/Header";
+import { ThemeProvider } from "@/components/client/ThemeProvider";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./../globals.css";
@@ -9,13 +12,13 @@ const GeistMono = localFont({
 });
 const geistVf = localFont({
     src: "./../fonts/GeistVF.woff",
-    variable: "--font-geist-mono",
+    variable: "--font-geist-sans",
     weight: "100 900",
 });
 
 export const metadata: Metadata = {
-    title: "Pronostic Manager",
-    description: "Pronostic Manager",
+    title: "Pronostic Manager - Prédictions Sportives Intelligentes",
+    description: "Optimisez vos pronostics sportifs avec notre IA de pointe",
 };
 
 export default function PresentationLayout({
@@ -24,9 +27,20 @@ export default function PresentationLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="fr">
-            <body className={`${GeistMono.variable} ${geistVf.variable}`}>
-                {children}
+        <html lang="fr" suppressHydrationWarning>
+            <body
+                className={`${GeistMono.variable} ${geistVf.variable} font-sans bg-gradient-to-br from-indigo-500 to-purple-600 text-white min-h-screen flex flex-col`}
+            >
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="dark"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <Header />
+                    <main className="flex-grow pt-20">{children}</main>
+                    <Footer />
+                </ThemeProvider>
             </body>
         </html>
     );

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { flattenColorPalette } from "./lib/utils";
 
 const config: Config = {
     darkMode: ["class"],
@@ -56,8 +57,34 @@ const config: Config = {
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
             },
+            animation: {
+                "gradient-x": "gradient-x 15s ease infinite",
+            },
+            keyframes: {
+                "gradient-x": {
+                    "0%, 100%": {
+                        "background-size": "200% 200%",
+                        "background-position": "left center",
+                    },
+                    "50%": {
+                        "background-size": "200% 200%",
+                        "background-position": "right center",
+                    },
+                },
+            },
         },
     },
-    plugins: [require("tailwindcss-animate")],
+    plugins: [require("tailwindcss-animate"), addVariablesForColors],
 };
+
+function addVariablesForColors({ addBase, theme }: any) {
+    const allColors = flattenColorPalette(theme("colors"));
+    const newVars = Object.fromEntries(
+        Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+    );
+
+    addBase({
+        ":root": newVars,
+    });
+}
 export default config;
