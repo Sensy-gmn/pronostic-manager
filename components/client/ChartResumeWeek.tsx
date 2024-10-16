@@ -120,7 +120,7 @@ export default function ChartResumeWeek() {
                                     marginBottom: "4px",
                                 }}
                                 formatter={(value) => [
-                                    formatEuro(value),
+                                    formatEuro(Number(value)),
                                     "Résultat",
                                 ]}
                             />

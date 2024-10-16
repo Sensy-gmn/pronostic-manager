@@ -43,7 +43,7 @@ export default function ListPronosticAvailable() {
     const [sortBy, setSortBy] = useState<"cote" | "heure">("heure");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     const [currentPage, setCurrentPage] = useState(1);
-    const matchesPerPage = 10; // Nous gardons une valeur fixe
+    const matchesPerPage = 12;
 
     const jour = new Date().toLocaleDateString("fr-FR", {
         day: "2-digit",

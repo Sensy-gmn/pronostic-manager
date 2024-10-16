@@ -24,7 +24,7 @@ interface CardPronosticProps {
 }
 
 export default function CardPronostic({ match }: CardPronosticProps) {
-    // Fonction pour calculer la probabilité à partir de la cote
+    // calculer la probabilité à partir de la cote
     const calculateProbability = (odds: number): number => {
         return Math.round((1 / odds) * 100);
     };
@@ -33,7 +33,7 @@ export default function CardPronostic({ match }: CardPronosticProps) {
     const prob1 = calculateProbability(match.cote);
     const prob2 = 100 - prob1;
 
-    // Fonction pour formater la probabilité
+    // formater la probabilité
     const formatProbability = (prob: number) => `${prob}%`;
 
     return (

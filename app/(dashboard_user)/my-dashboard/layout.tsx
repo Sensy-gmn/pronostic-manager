@@ -69,7 +69,6 @@ export default function DashboardLayout({
     }, [pathname]);
 
     useEffect(() => {
-        // Remove the attribute causing the hydration warning
         document.body.removeAttribute("cz-shortcut-listen");
     }, []);
 

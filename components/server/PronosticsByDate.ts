@@ -38,7 +38,7 @@ export async function getPronosticsByDate(
             $or: [
                 { jour: jour },
                 { "jour.value": jour },
-                { jour: { $regex: new RegExp(jour, "i") } }, // Ajout d'une recherche insensible à la casse
+                { jour: { $regex: new RegExp(jour, "i") } },
             ],
         };
 

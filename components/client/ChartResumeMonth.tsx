@@ -115,7 +115,7 @@ export default function ChartResumeMonth() {
                                     marginBottom: "4px",
                                 }}
                                 formatter={(value) => [
-                                    formatEuro(value),
+                                    formatEuro(Number(value)),
                                     "Résultat",
                                 ]}
                             />

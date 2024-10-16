@@ -34,7 +34,7 @@ export async function getPronosticsBySport(sport: string): Promise<Match[]> {
             $or: [
                 { sport: sport },
                 { "sport.value": sport },
-                { sport: { $regex: new RegExp(sport, "i") } }, // Ajout d'une recherche insensible à la casse
+                { sport: { $regex: new RegExp(sport, "i") } },
             ],
         };
 
