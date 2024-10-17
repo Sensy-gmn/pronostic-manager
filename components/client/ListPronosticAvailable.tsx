@@ -78,8 +78,6 @@ export default function ListPronosticAvailable() {
 
     const [sortedMatches, setSortedMatches] = useState<Match[]>([]);
 
-    const indexOfLastMatch = currentPage * matchesPerPage;
-    const indexOfFirstMatch = indexOfLastMatch - matchesPerPage;
     const currentMatches = sortedMatches.slice(
         (currentPage - 1) * matchesPerPage,
         currentPage * matchesPerPage

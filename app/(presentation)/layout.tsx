@@ -1,6 +1,7 @@
 import { Footer } from "@/components/client/Footer";
 import { Header } from "@/components/client/Header";
 import { ThemeProvider } from "@/components/client/ThemeProvider";
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./../globals.css";
@@ -29,8 +30,9 @@ export default function PresentationLayout({
     return (
         <html lang="fr" suppressHydrationWarning>
             <body
-                className={`${GeistMono.variable} ${geistVf.variable} font-sans bg-gradient-to-br from-indigo-500 to-purple-600 text-white min-h-screen flex flex-col`}
+                className={`${GeistMono.variable} ${geistVf.variable} font-sans bg-gray-950 text-white min-h-screen flex flex-col`}
             >
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none"></div>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="dark"
@@ -38,7 +40,7 @@ export default function PresentationLayout({
                     disableTransitionOnChange
                 >
                     <Header />
-                    <main className="flex-grow pt-20">{children}</main>
+                    <main className="flex-grow relative z-10">{children}</main>
                     <Footer />
                 </ThemeProvider>
             </body>
