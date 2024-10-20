@@ -30,9 +30,9 @@ export default function PresentationLayout({
     return (
         <html lang="fr" suppressHydrationWarning>
             <body
-                className={`${GeistMono.variable} ${geistVf.variable} font-sans bg-gray-950 text-white min-h-screen flex flex-col`}
+                className={`${GeistMono.variable} ${geistVf.variable} font-sans text-white min-h-screen flex flex-col`}
             >
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none"></div>
+                <div className="absolute inset-0  opacity-[0.03] pointer-events-none"></div>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="dark"

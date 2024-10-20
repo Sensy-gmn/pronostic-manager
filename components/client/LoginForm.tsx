@@ -14,13 +14,18 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+// Ajout d'un nouveau composant pour le skeleton
+import LoginSkeleton from "./Skeleton";
+
 export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
         console.log("Tentative de connexion...");
         try {
             const response = await fetch("/api/auth/login", {
@@ -35,18 +40,25 @@ export default function LoginForm() {
             if (response.ok) {
                 console.log("Connexion réussie, tentative de redirection...");
                 router.push("/my-dashboard");
+                // Ne pas désactiver le loading ici, car on veut garder le skeleton pendant la redirection
             } else {
                 console.error("Erreur de connexion:", data.error);
                 alert(
                     data.error ||
                         "Une erreur est survenue lors de la connexion."
                 );
+                setIsLoading(false);
             }
         } catch (error) {
             console.error("Une erreur est survenue:", error);
             alert("Une erreur inattendue est survenue. Veuillez réessayer.");
+            setIsLoading(false);
         }
     };
+
+    if (isLoading) {
+        return <LoginSkeleton />;
+    }
 
     return (
         <Card className="w-full shadow-lg">

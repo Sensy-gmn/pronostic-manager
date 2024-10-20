@@ -1,6 +1,6 @@
 "use client";
 
-import LogoutButton from "@/components/client/LogoutButton";
+import { AppSidebar } from "@/components/client/app-sidebar";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -10,53 +10,58 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-    Bell,
-    Briefcase,
-    Building,
-    Home,
-    MessageSquare,
-    PanelLeft,
-    Settings,
-    User,
-    Users2,
-} from "lucide-react";
-import Link from "next/link";
+    SidebarContent,
+    SidebarHeader,
+    SidebarInset,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+    SidebarProvider,
+    SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { ChevronDown, GalleryVerticalEnd, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import "../../globals.css";
+
+// Exemple de données de navigation
+const navMain = [
+    {
+        title: "Dashboard",
+        items: [
+            { title: "Overview", url: "/my-dashboard", isActive: false },
+            {
+                title: "Analytics",
+                url: "/my-dashboard/analytics",
+                isActive: false,
+            },
+        ],
+    },
+    {
+        title: "Management",
+        items: [
+            { title: "Users", url: "/my-dashboard/users", isActive: false },
+            {
+                title: "Projects",
+                url: "/my-dashboard/projects",
+                isActive: false,
+            },
+        ],
+    },
+];
 
 export default function DashboardLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const activeLink =
-        "flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8";
-
-    const inactiveLink =
-        "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8";
-
     const pathname = usePathname();
-
-    const getLinkClassName = (path: string) => {
-        return path === pathname ? activeLink : inactiveLink;
-    };
 
     const breadcrumbs = useMemo(() => {
         const pathParts = pathname.split("/").filter(Boolean);
@@ -69,225 +74,101 @@ export default function DashboardLayout({
         });
     }, [pathname]);
 
-    useEffect(() => {
-        document.body.removeAttribute("cz-shortcut-listen");
-    }, []);
-
     return (
-        <html lang="fr">
-            <body suppressHydrationWarning={true} className="bg-gray-600">
-                <div className="flex min-h-screen w-full flex-col bg-muted/40">
-                    <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-                        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-                            <TooltipProvider>
-                                <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
-                                    <nav className="flex flex-col items-center gap-4 px-2 py-4">
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="/my-dashboard"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard"
+        <html>
+            <body>
+                <SidebarProvider>
+                    <AppSidebar>
+                        <SidebarHeader className="border-b px-6 py-3">
+                            <div className="flex items-center gap-2">
+                                <GalleryVerticalEnd className="h-6 w-6" />
+                                <div className="font-semibold">Dashboard</div>
+                            </div>
+                        </SidebarHeader>
+                        <SidebarContent>
+                            <div className="space-y-4 py-4">
+                                <div className="px-3 py-2">
+                                    <form>
+                                        <div className="relative">
+                                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                type="search"
+                                                placeholder="Search..."
+                                                className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+                                            />
+                                        </div>
+                                    </form>
+                                </div>
+                                <div className="px-3 py-2">
+                                    <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+                                        Navigation
+                                    </h2>
+                                    <SidebarMenu>
+                                        {navMain.map((section) => (
+                                            <SidebarMenuItem
+                                                key={section.title}
+                                            >
+                                                <SidebarMenuButton asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="w-full justify-between font-normal"
+                                                    >
+                                                        {section.title}
+                                                        <ChevronDown className="h-4 w-4" />
+                                                    </Button>
+                                                </SidebarMenuButton>
+                                                <SidebarMenuSub>
+                                                    {section.items.map(
+                                                        (item) => (
+                                                            <SidebarMenuSubItem
+                                                                key={item.title}
+                                                            >
+                                                                <SidebarMenuSubButton
+                                                                    asChild
+                                                                    isActive={
+                                                                        pathname ===
+                                                                        item.url
+                                                                    }
+                                                                >
+                                                                    <a
+                                                                        href={
+                                                                            item.url
+                                                                        }
+                                                                        className="block w-full rounded-md px-2 py-1 hover:bg-muted"
+                                                                    >
+                                                                        {
+                                                                            item.title
+                                                                        }
+                                                                    </a>
+                                                                </SidebarMenuSubButton>
+                                                            </SidebarMenuSubItem>
+                                                        )
                                                     )}
-                                                >
-                                                    <Home className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        My Dashboard
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                My Dashboard
-                                            </TooltipContent>
-                                        </Tooltip>
-
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="/my-dashboard/empty"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard/empty"
-                                                    )}
-                                                >
-                                                    <Building className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        empty
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                empty
-                                            </TooltipContent>
-                                        </Tooltip>
-
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="/my-dashboard/empty"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard/empty"
-                                                    )}
-                                                >
-                                                    <Users2 className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        empty
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                empty
-                                            </TooltipContent>
-                                        </Tooltip>
-
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="/my-dashboard/empty"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard/empty"
-                                                    )}
-                                                >
-                                                    <Briefcase className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        empty
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                empty
-                                            </TooltipContent>
-                                        </Tooltip>
-
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="/my-dashboard/empty"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard/empty"
-                                                    )}
-                                                >
-                                                    <MessageSquare className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        empty
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                empty
-                                            </TooltipContent>
-                                        </Tooltip>
-
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="/my-dashboard/empty"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard/empty"
-                                                    )}
-                                                >
-                                                    <Bell className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        empty
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                empty
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </nav>
-                                    <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-4">
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link
-                                                    href="#"
-                                                    className={getLinkClassName(
-                                                        "/my-dashboard/empty"
-                                                    )}
-                                                >
-                                                    <Settings className="h-5 w-5" />
-                                                    <span className="sr-only">
-                                                        empty
-                                                    </span>
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right">
-                                                empty
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </nav>
-                                </aside>
-                            </TooltipProvider>
-
-                            <Sheet>
-                                <SheetTrigger asChild>
-                                    <Button
-                                        size="icon"
-                                        variant="outline"
-                                        className="sm:hidden"
-                                    >
-                                        <PanelLeft className="h-5 w-5" />
-                                        <span className="sr-only">Toggle</span>
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent
-                                    side="left"
-                                    className="sm:max-w-xs"
-                                >
-                                    <nav className="grid gap-6 text-lg font-medium">
-                                        <Link
-                                            href="/my-dashboard"
-                                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                                        >
-                                            <Home className="h-5 w-5" />
-                                            My Dashboard
-                                        </Link>
-                                        <Link
-                                            href="/my-dashboard"
-                                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                                        >
-                                            <Building className="h-5 w-5" />
-                                            empty
-                                        </Link>
-                                        <Link
-                                            href="/my-dashboard"
-                                            className="flex items-center gap-4 px-2.5 text-foreground"
-                                        >
-                                            <Users2 className="h-5 w-5" />
-                                            empty
-                                        </Link>
-                                        <Link
-                                            href="/my-dashboard"
-                                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                                        >
-                                            <Briefcase className="h-5 w-5" />
-                                            empty
-                                        </Link>
-                                        <Link
-                                            href="/my-dashboard"
-                                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                                        >
-                                            <MessageSquare className="h-5 w-5" />
-                                            empty
-                                        </Link>
-                                    </nav>
-                                </SheetContent>
-                            </Sheet>
-
-                            <Breadcrumb className="hidden md:flex">
+                                                </SidebarMenuSub>
+                                            </SidebarMenuItem>
+                                        ))}
+                                    </SidebarMenu>
+                                </div>
+                            </div>
+                        </SidebarContent>
+                    </AppSidebar>
+                    <SidebarInset>
+                        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                            <SidebarTrigger className="-ml-1" />
+                            <Separator
+                                orientation="vertical"
+                                className="mr-2 h-4"
+                            />
+                            <Breadcrumb>
                                 <BreadcrumbList>
                                     {breadcrumbs.map((breadcrumb, index) => (
-                                        <BreadcrumbItem key={index}>
+                                        <BreadcrumbItem key={breadcrumb.href}>
                                             {index < breadcrumbs.length - 1 ? (
                                                 <>
-                                                    <BreadcrumbLink asChild>
-                                                        <Link
-                                                            href={
-                                                                breadcrumb.href
-                                                            }
-                                                        >
-                                                            {breadcrumb.label}
-                                                        </Link>
+                                                    <BreadcrumbLink
+                                                        href={breadcrumb.href}
+                                                    >
+                                                        {breadcrumb.label}
                                                     </BreadcrumbLink>
                                                     <BreadcrumbSeparator />
                                                 </>
@@ -300,37 +181,10 @@ export default function DashboardLayout({
                                     ))}
                                 </BreadcrumbList>
                             </Breadcrumb>
-
-                            <div className="relative ml-auto flex-1 grow-0 ">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            className="overflow-hidden rounded-full"
-                                        >
-                                            <User className="h-10 w-10 overflow-hidden rounded-full" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Dashboard
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>
-                                            <Link href="/">Client view</Link>
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem>
-                                            <LogoutButton />
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
                         </header>
-                    </div>
-                    {children}
-                </div>
+                        <main className="flex-1 p-4">{children}</main>
+                    </SidebarInset>
+                </SidebarProvider>
             </body>
         </html>
     );
