@@ -38,9 +38,12 @@ export default function LoginForm() {
             console.log("Réponse du serveur:", data);
 
             if (response.ok) {
-                console.log("Connexion réussie, tentative de redirection...");
+                if (data.token) {
+                    localStorage.setItem("token", data.token); // Stockage token
+                } else {
+                    console.error("Token manquant dans la réponse");
+                }
                 router.push("/my-dashboard");
-                // Ne pas désactiver le loading ici, car on veut garder le skeleton pendant la redirection
             } else {
                 console.error("Erreur de connexion:", data.error);
                 alert(

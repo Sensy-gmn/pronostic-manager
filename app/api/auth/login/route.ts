@@ -1,13 +1,15 @@
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { TextEncoder } from "util";
 
 interface User {
-    _id: string;
+    _id: ObjectId;
     email: string;
     password: string;
+    name: string;
+    role: string;
 }
 
 export async function POST(request: Request) {
@@ -28,7 +30,7 @@ export async function POST(request: Request) {
 
         const { email, password } = await request.json();
 
-        // Check if email and password are provided
+        // Vérification email et password
         if (!email || !password) {
             return NextResponse.json(
                 { error: "Email and password are required" },
@@ -36,7 +38,7 @@ export async function POST(request: Request) {
             );
         }
 
-        // Find the user
+        // Recherche user
         const user = await collection.findOne({ email });
         if (!user) {
             return NextResponse.json(
@@ -45,36 +47,39 @@ export async function POST(request: Request) {
             );
         }
 
-        // Check password
+        // Vérification password
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return NextResponse.json(
-                { error: "Invalid password" },
-                { status: 400 }
+        if (isPasswordValid) {
+            const token = await new SignJWT({ userId: user._id.toString() })
+                .setProtectedHeader({ alg: "HS256" })
+                .setExpirationTime("1h")
+                .sign(new TextEncoder().encode(process.env.JWT_SECRET));
+
+            const response = NextResponse.json(
+                {
+                    message: "Login successful",
+                    token,
+                    redirectUrl: "/my-dashboard",
+                },
+                { status: 200 }
             );
+
+            // Définition token comme cookie HttpOnly
+            response.cookies.set("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV !== "development",
+                sameSite: "strict",
+                maxAge: 3600,
+                path: "/",
+            });
+
+            return response;
         }
 
-        // Création du JWT token avec jose
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const token = await new SignJWT({ userId: user._id.toString() })
-            .setProtectedHeader({ alg: "HS256" })
-            .setExpirationTime("1h")
-            .sign(secret);
-
-        // Set cookie with token
-        const response = NextResponse.json(
-            { message: "Login successful", redirectUrl: "/my-dashboard" },
-            { status: 200 }
+        return NextResponse.json(
+            { error: "Invalid password" },
+            { status: 400 }
         );
-        response.cookies.set("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== "development",
-            sameSite: "strict",
-            maxAge: 3600,
-            path: "/",
-        });
-
-        return response;
     } catch (error) {
         console.error("Error logging in:", error);
         return NextResponse.json(

@@ -1,6 +1,8 @@
 "use client";
 
 import { AppSidebar } from "@/components/client/app-sidebar";
+import LogoutButton from "@/components/client/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -10,6 +12,12 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -25,12 +33,13 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { ChevronDown, GalleryVerticalEnd, Search } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { useUser } from "@/hooks/useUser";
+import { ChevronDown, GalleryVerticalEnd, Search, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
 import "../../globals.css";
 
-// Exemple de données de navigation
+// Data de navigation
 const navMain = [
     {
         title: "Dashboard",
@@ -61,7 +70,15 @@ export default function DashboardLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const { user, loading } = useUser();
+    const router = useRouter();
     const pathname = usePathname();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push("/login");
+        }
+    }, [user, loading, router]);
 
     const breadcrumbs = useMemo(() => {
         const pathParts = pathname.split("/").filter(Boolean);
@@ -74,118 +91,132 @@ export default function DashboardLayout({
         });
     }, [pathname]);
 
+    if (loading) {
+        return <div>Chargement...</div>;
+    }
+
+    if (!user) {
+        return null;
+    }
+
+    console.log(user);
+
     return (
-        <html>
-            <body>
-                <SidebarProvider>
-                    <AppSidebar>
-                        <SidebarHeader className="border-b px-6 py-3">
-                            <div className="flex items-center gap-2">
-                                <GalleryVerticalEnd className="h-6 w-6" />
-                                <div className="font-semibold">Dashboard</div>
-                            </div>
-                        </SidebarHeader>
-                        <SidebarContent>
-                            <div className="space-y-4 py-4">
-                                <div className="px-3 py-2">
-                                    <form>
-                                        <div className="relative">
-                                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                type="search"
-                                                placeholder="Search..."
-                                                className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-                                            />
-                                        </div>
-                                    </form>
+        <SidebarProvider>
+            <AppSidebar>
+                <SidebarHeader className="border-b px-6 py-3">
+                    <div className="flex items-center gap-2">
+                        <GalleryVerticalEnd className="h-6 w-6" />
+                        <div className="font-semibold">Dashboard</div>
+                    </div>
+                </SidebarHeader>
+                <SidebarContent>
+                    <div className="space-y-4 py-4">
+                        <div className="px-3 py-2">
+                            <form>
+                                <div className="relative">
+                                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="search"
+                                        placeholder="Search..."
+                                        className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+                                    />
                                 </div>
-                                <div className="px-3 py-2">
-                                    <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-                                        Navigation
-                                    </h2>
-                                    <SidebarMenu>
-                                        {navMain.map((section) => (
-                                            <SidebarMenuItem
-                                                key={section.title}
+                            </form>
+                        </div>
+                        <div className="px-3 py-2">
+                            <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+                                Navigation
+                            </h2>
+                            <SidebarMenu>
+                                {navMain.map((section) => (
+                                    <SidebarMenuItem key={section.title}>
+                                        <SidebarMenuButton asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-between font-normal"
                                             >
-                                                <SidebarMenuButton asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        className="w-full justify-between font-normal"
+                                                {section.title}
+                                                <ChevronDown className="h-4 w-4" />
+                                            </Button>
+                                        </SidebarMenuButton>
+                                        <SidebarMenuSub>
+                                            {section.items.map((item) => (
+                                                <SidebarMenuSubItem
+                                                    key={item.title}
+                                                >
+                                                    <SidebarMenuSubButton
+                                                        asChild
+                                                        isActive={
+                                                            pathname ===
+                                                            item.url
+                                                        }
                                                     >
-                                                        {section.title}
-                                                        <ChevronDown className="h-4 w-4" />
-                                                    </Button>
-                                                </SidebarMenuButton>
-                                                <SidebarMenuSub>
-                                                    {section.items.map(
-                                                        (item) => (
-                                                            <SidebarMenuSubItem
-                                                                key={item.title}
-                                                            >
-                                                                <SidebarMenuSubButton
-                                                                    asChild
-                                                                    isActive={
-                                                                        pathname ===
-                                                                        item.url
-                                                                    }
-                                                                >
-                                                                    <a
-                                                                        href={
-                                                                            item.url
-                                                                        }
-                                                                        className="block w-full rounded-md px-2 py-1 hover:bg-muted"
-                                                                    >
-                                                                        {
-                                                                            item.title
-                                                                        }
-                                                                    </a>
-                                                                </SidebarMenuSubButton>
-                                                            </SidebarMenuSubItem>
-                                                        )
-                                                    )}
-                                                </SidebarMenuSub>
-                                            </SidebarMenuItem>
-                                        ))}
-                                    </SidebarMenu>
-                                </div>
-                            </div>
-                        </SidebarContent>
-                    </AppSidebar>
-                    <SidebarInset>
-                        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                            <SidebarTrigger className="-ml-1" />
-                            <Separator
-                                orientation="vertical"
-                                className="mr-2 h-4"
-                            />
-                            <Breadcrumb>
-                                <BreadcrumbList>
-                                    {breadcrumbs.map((breadcrumb, index) => (
-                                        <BreadcrumbItem key={breadcrumb.href}>
-                                            {index < breadcrumbs.length - 1 ? (
-                                                <>
-                                                    <BreadcrumbLink
-                                                        href={breadcrumb.href}
-                                                    >
-                                                        {breadcrumb.label}
-                                                    </BreadcrumbLink>
-                                                    <BreadcrumbSeparator />
-                                                </>
-                                            ) : (
-                                                <BreadcrumbPage>
-                                                    {breadcrumb.label}
-                                                </BreadcrumbPage>
-                                            )}
-                                        </BreadcrumbItem>
-                                    ))}
-                                </BreadcrumbList>
-                            </Breadcrumb>
-                        </header>
-                        <main className="flex-1 p-4">{children}</main>
-                    </SidebarInset>
-                </SidebarProvider>
-            </body>
-        </html>
+                                                        <a
+                                                            href={item.url}
+                                                            className="block w-full rounded-md px-2 py-1 hover:bg-muted"
+                                                        >
+                                                            {item.title}
+                                                        </a>
+                                                    </SidebarMenuSubButton>
+                                                </SidebarMenuSubItem>
+                                            ))}
+                                        </SidebarMenuSub>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </div>
+                    </div>
+                </SidebarContent>
+            </AppSidebar>
+            <SidebarInset>
+                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="mr-2 h-4" />
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            {breadcrumbs.map((breadcrumb, index) => (
+                                <BreadcrumbItem key={breadcrumb.href}>
+                                    {index < breadcrumbs.length - 1 ? (
+                                        <>
+                                            <BreadcrumbLink
+                                                href={breadcrumb.href}
+                                            >
+                                                {breadcrumb.label}
+                                            </BreadcrumbLink>
+                                            <BreadcrumbSeparator />
+                                        </>
+                                    ) : (
+                                        <BreadcrumbPage>
+                                            {breadcrumb.label}
+                                        </BreadcrumbPage>
+                                    )}
+                                </BreadcrumbItem>
+                            ))}
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                    <span>Bienvenue, {user.username}</span>
+
+                    <div className="ml-auto flex items-center gap-2">
+                        <ThemeToggle />
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <User className="h-5 w-5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                    <LogoutButton />
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </header>
+
+                <main className="flex-1 p-4">{children}</main>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }

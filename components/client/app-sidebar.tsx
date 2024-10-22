@@ -1,4 +1,8 @@
-import { Calendar, Home, Plus, Search, Settings } from "lucide-react";
+import { useUser } from "@/hooks/useUser";
+import { Calendar, ChevronDown, Home, Plus, Settings } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import {
     Sidebar,
@@ -11,60 +15,103 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Menu items.
+// Menu items
 const items = [
     {
-        title: "Home",
-        url: "#",
+        title: "Platform",
         icon: Home,
+        subItems: [
+            { title: "Playground", url: "/playground" },
+            { title: "History", url: "/history" },
+            { title: "Starred", url: "/starred" },
+            { title: "Settings", url: "/settings" },
+        ],
     },
     {
-        title: "Ajouter un pronostic",
-        url: "#",
+        title: "Models",
         icon: Plus,
+        url: "/models",
     },
     {
-        title: "Calendar",
-        url: "#",
+        title: "Documentation",
         icon: Calendar,
-    },
-    {
-        title: "Search",
-        url: "#",
-        icon: Search,
+        url: "/documentation",
     },
     {
         title: "Settings",
-        url: "#",
         icon: Settings,
+        url: "/settings",
     },
 ];
 
 export function AppSidebar() {
-    return (
-        <Sidebar>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>My Dashboard</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+    const { user, loading } = useUser();
+    const router = useRouter();
+    const [expandedItem, setExpandedItem] = useState("Platform");
 
-                <SidebarGroup>
-                    <SidebarGroupLabel>Actions</SidebarGroupLabel>
-                </SidebarGroup>
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        router.push("/login");
+    };
+
+    if (loading) {
+        return <div>Chargement...</div>;
+    }
+
+    if (!user) {
+        return null;
+    }
+
+    return (
+        <Sidebar className="bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)]">
+            <SidebarContent>
+                {items.map((item) => (
+                    <SidebarGroup key={item.title}>
+                        <SidebarGroupLabel
+                            className="flex items-center justify-between px-4 py-2 hover:bg-[var(--sidebar-accent)] cursor-pointer"
+                            onClick={() =>
+                                setExpandedItem(
+                                    expandedItem === item.title
+                                        ? ""
+                                        : item.title
+                                )
+                            }
+                        >
+                            <div className="flex items-center gap-2">
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.title}</span>
+                            </div>
+                            {item.subItems && (
+                                <ChevronDown
+                                    className={`h-4 w-4 transition-transform ${
+                                        expandedItem === item.title
+                                            ? "rotate-180"
+                                            : ""
+                                    }`}
+                                />
+                            )}
+                        </SidebarGroupLabel>
+                        {item.subItems && expandedItem === item.title && (
+                            <SidebarGroupContent>
+                                <SidebarMenu>
+                                    {item.subItems.map((subItem) => (
+                                        <SidebarMenuItem key={subItem.title}>
+                                            <SidebarMenuButton asChild>
+                                                <Link
+                                                    href={subItem.url}
+                                                    className="block pl-8 pr-4 py-2 hover:bg-[var(--sidebar-accent)] relative"
+                                                >
+                                                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-[var(--sidebar-border)]"></div>
+                                                    {subItem.title}
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    ))}
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        )}
+                    </SidebarGroup>
+                ))}
             </SidebarContent>
         </Sidebar>
     );
